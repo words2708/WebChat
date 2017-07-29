@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Firebase Web Chat using JavaScript</title>
+  <script src='https://cdn.firebase.com/js/client/2.4.2/firebase.js'></script>
+  <h1>Firebase Web Chat using JavaScript</h1>
+  <style>
+    :scope { display: block }
+    h1 {background-color:#3a4ed5;
+        color:#3ACFD5;
+        text-align:center;
+        text-transform: capitalize;
+    }
+    body {
+      font-family: 'Impact';
+    }
+    .msg {
+      border-radius: 30px;
+      margin: 50px auto;
+      padding: 40px;
+      width: 400px;
+      height: 200px;
+      border-top: 20px solid #3ACFD5;
+      border-bottom: 20px solid #3a4ed5;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      background-position: 0 0, 100% 0;
+      background-repeat: no-repeat;
+      -webkit-background-size: 20px 100%;
+      -moz-background-size: 20px 100%;
+      background-size: 20px 100%;
+      background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMSAxIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIj48bGluZWFyR3JhZGllbnQgaWQ9Imxlc3NoYXQtZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMzYWNmZDUiIHN0b3Atb3BhY2l0eT0iMSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzNhNGVkNSIgc3RvcC1vcGFjaXR5PSIxIi8+PC9saW5lYXJHcmFkaWVudD48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2xlc3NoYXQtZ2VuZXJhdGVkKSIgLz48L3N2Zz4=),url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMSAxIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIj48bGluZWFyR3JhZGllbnQgaWQ9Imxlc3NoYXQtZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMzYWNmZDUiIHN0b3Atb3BhY2l0eT0iMSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzNhNGVkNSIgc3RvcC1vcGFjaXR5PSIxIi8+PC9saW5lYXJHcmFkaWVudD48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2xlc3NoYXQtZ2VuZXJhdGVkKSIgLz48L3N2Zz4=);
+      background-image: -webkit-linear-gradient(top, #3acfd5 0%, #3a4ed5 100%), -webkit-linear-gradient(top, #3acfd5 0%, #3a4ed5 100%);
+      background-image: -moz-linear-gradient(top, #3acfd5 0%, #3a4ed5 100%), -moz-linear-gradient(top, #3acfd5 0%, #3a4ed5 100%);
+      background-image: -o-linear-gradient(top, #3acfd5 0%, #3a4ed5 100%), -o-linear-gradient(top, #3acfd5 0%, #3a4ed5 100%);
+      background-image: linear-gradient(to bottom, #3acfd5 0%, #3a4ed5 100%), linear-gradient(to bottom, #3acfd5 0%, #3a4ed5 100%);
+    }
+    #webchatDiv{
+    height: 750px;
+    width: 550px;
+    overflow: auto;
+    }
+    #send {
+    	/* background styles */
+      border-radius: 25px;
+    	position: relative;
+    	display: inline-block;
+    	padding: 15px 25px;
+    	background-color: blue; /*for compatibility with older browsers*/
+    	background-image: linear-gradient(blue,lightblue);
+
+    	/* text styles */
+    	text-decoration: none;
+    	color: #fff;
+    	font-size: 25px;
+    	font-family: Impact;
+    	font-weight: 100;
+    }
+    #wallpapers {
+    	/* background styles */
+      border-radius: 25px;
+    	position: relative;
+    	display: inline-block;
+    	padding: 15px 25px;
+    	background-color: green; /*for compatibility with older browsers*/
+    	background-image: linear-gradient(green,green);
+
+    	/* text styles */
+    	text-decoration: none;
+    	color: #fff;
+    	font-size: 25px;
+    	font-family: Impact;
+    	font-weight: 100;
+    }
+    #username{
+      border-radius: 25px;
+      width: 200px;
+      padding:40px;
+      border: 10px solid #3ACFD5;
+    }
+    #text{
+      border-radius: 25px;
+      width: 200px;
+      padding:40px;
+      border: 10px solid #3a4ed5;
+    }
+    #login {
+      border-radius: 25px;
+      padding: 0.5em 1em;
+      background-color: #DD4B39;
+      border: none;
+      color: #FFF;
+      cursor: pointer;
+    }
+    #logout {
+      border-radius: 25px;
+      padding: 0.5em 1em;
+      background-color: #DD4B39;
+      border: none;
+      color: #FFF;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <input id="username" type="text" placeholder="Name"><br/>
+  <input id="text" type="text" placeholder="Message"><br/>
+  <button id="send">Send</button><br/>
+  <button id="wallpapers" type="button" onclick="wallpaperFunc()">Set Wallpaper</button><br/>
+  <button id="login">Login using Email</button><br/>
+  <button id="logout">Logout</button><br/>
+
+  <div id="webchatDiv"></div>
+  <script src="https://www.gstatic.com/firebasejs/4.1.5/firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/4.1.5/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/4.1.5/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/4.1.5/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/4.1.5/firebase-messaging.js"></script>
+
+  <script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyB6toKmdGJS1lWg5U75XpVIA1BTtFgaelA",
+    authDomain: "webchat-16aa0.firebaseapp.com",
+    databaseURL: "https://webchat-16aa0.firebaseio.com",
+    projectId: "webchat-16aa0",
+    storageBucket: "webchat-16aa0.appspot.com",
+    messagingSenderId: "38775103748"
+  };
+  firebase.initializeApp(config);
+  </script>
+
+
+  <!--Firebase Database Variable for storage use-->
+  <script>
+
+    function wallpaperFunc(){
+      document.body.style.backgroundImage = "url('http://cdn.wonderfulengineering.com/wp-content/uploads/2014/09/blue-wallpaper-6.jpg')";
+    }
+    // BUGBUG: using following firebase project's database fails but
+    // successful with demo firebase database.
+    // need to investigate further
+    //var myFirebase = new Firebase("https://webchat-16aa0.firebaseio.com/");
+    var myFirebase = new Firebase('https://chat-example.firebaseio-demo.com/');
+
+    //Code for Event Listener on send Button
+    var usernameInput = document.querySelector('#username');
+    var textInput = document.querySelector('#text');
+    var sendButton = document.querySelector('#send');
+    var username = null;
+    var loginButton = document.querySelector('#login');
+    var logoutButton = document.querySelector('#logout');
+    sendButton.style.display = "none";
+    textInput.style.display = "none";
+
+    sendButton.addEventListener("click", function() {
+      var msgUser = usernameInput.value;
+      var msgText = textInput.value;
+      myFirebase.push({username:msgUser, text:msgText});
+      textInput.value = "";
+      });
+
+    /** Function to add a listener for whenever a new message arrives **/
+    var startListening = function() {
+    myFirebase.on('child_added', function(snapshot) {
+      var msg = snapshot.val();
+      var msgUsernameElement = document.createElement("b");
+      msgUsernameElement.textContent = msg.username;
+      var msgTextElement = document.createElement("p");
+      msgTextElement.textContent = msg.text;
+      var msgElement = document.createElement("div");
+      msgElement.appendChild(msgUsernameElement);
+      msgElement.appendChild(msgTextElement);
+      msgElement.className = "msg";
+      document.getElementById("webchatDiv").appendChild(msgElement);
+    });
+    }
+
+    var email = "words2708@gmail.com";
+    var password = "pass123";
+
+    loginButton.addEventListener("click", function() {
+      //email/password signin user
+      firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+  	     console.log(error);
+      });
+
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          // User is signed in.
+          var displayName = user.displayName;
+          var email = user.email;
+          var emailVerified = user.emailVerified;
+          var photoURL = user.photoURL;
+          var isAnonymous = user.isAnonymous;
+          var uid = user.uid;
+          var providerData = user.providerData;
+          loginButton.disabled = true;
+          sendButton.style.display = "block";
+          textInput.style.display = "block";
+
+          // Start listening for data
+          startListening();
+        } else {
+          // User is signed out.
+          // ...
+        }
+      });
+  });//end email/pass auth
+  logoutButton.addEventListener("click", function() {
+    firebase.auth().signOut().then(function() {
+      // Sign-out successful.
+      location.reload();//refreshes page and clears chat history & settings
+      loginButton.disabled = false;//enable login button status to sign backin
+      sendButton.style.display = "none";
+      textInput.style.display = "none";
+      }, function(error) {
+    	console.log(error);
+    });
+  });
+
+  // BUGBUG: Following code fails at Firebase console not setup
+  // even after setup done.
+  // Need to investigate further.
+  /*
+  // Google Authentication till end of session
+  loginButton.addEventListener("click", function() {
+    var provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/plus.login');
+    firebase.auth().signInWithPopup(provider).then(function(authData) {
+    	console.log(authData);
+    }).catch(function(error) {
+    	console.log(error);
+    });
+  });
+
+  myFirebase.onAuth(function (authData) {
+  if (authData) {
+      username = authData.google.displayName;
+      loginButton.textContent = "Logged in as " + username;
+      loginButton.disabled = true;
+      sendButton.style.display = "block";
+      textInput.style.display = "block";
+
+      // Start listening for data
+      startListening();
+  }
+  });
+  */
+  </script>
+</body>
+</html>
