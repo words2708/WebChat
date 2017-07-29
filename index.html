@@ -139,11 +139,10 @@
     function wallpaperFunc(){
       document.body.style.backgroundImage = "url('http://cdn.wonderfulengineering.com/wp-content/uploads/2014/09/blue-wallpaper-6.jpg')";
     }
-    // BUGBUG: using following firebase project's database fails but
-    // successful with demo firebase database.
-    // need to investigate further
-    //var myFirebase = new Firebase("https://webchat-16aa0.firebaseio.com/");
-    var myFirebase = new Firebase('https://chat-example.firebaseio-demo.com/');
+
+    // Fixed issue by setting rules to read and write true in Firebase Console
+    // for Database. This resolves multiple instances sending text messages as well
+    var myFirebase = new Firebase("https://webchat-16aa0.firebaseio.com/");
 
     //Code for Event Listener on send Button
     var usernameInput = document.querySelector('#username');
@@ -162,6 +161,7 @@
       textInput.value = "";
       });
 
+
     /** Function to add a listener for whenever a new message arrives **/
     var startListening = function() {
     myFirebase.on('child_added', function(snapshot) {
@@ -177,6 +177,7 @@
       document.getElementById("webchatDiv").appendChild(msgElement);
     });
     }
+
 
     var email = "words2708@gmail.com";
     var password = "pass123";
