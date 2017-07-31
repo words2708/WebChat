@@ -88,7 +88,15 @@
       padding:40px;
       border: 10px solid #3a4ed5;
     }
-    #login {
+    #user1login {
+      border-radius: 25px;
+      padding: 0.5em 1em;
+      background-color: #DD4B39;
+      border: none;
+      color: #FFF;
+      cursor: pointer;
+    }
+    #user2login {
       border-radius: 25px;
       padding: 0.5em 1em;
       background-color: #DD4B39;
@@ -112,7 +120,9 @@
   <input id="text" type="text" placeholder="Message"><br/>
   <button id="send">Send</button><br/>
   <button id="wallpapers" type="button" onclick="wallpaperFunc()">Set Wallpaper</button><br/>
-  <button id="login">Login using Email</button><br/>
+  <!--<button id="login">Login using Email</button><br/> -->
+  <button id="user1login">User1 Login</button><br/>
+  <button id="user2login">User2 Login</button><br/>
   <button id="logout">Logout</button><br/>
 
   <div id="webchatDiv"></div>
@@ -152,7 +162,9 @@
     var textInput = document.querySelector('#text');
     var sendButton = document.querySelector('#send');
     var username = null;
-    var loginButton = document.querySelector('#login');
+    //var loginButton = document.querySelector('#login');
+    var user1loginButton = document.querySelector('#user1login');
+    var user2loginButton = document.querySelector('#user2login');
     var logoutButton = document.querySelector('#logout');
     sendButton.style.display = "none";
     textInput.style.display = "none";
@@ -181,78 +193,102 @@
     });
     }
 
-
     var email = "words2708@gmail.com";
     var password = "pass123";
 
-    loginButton.addEventListener("click", function() {
+    var email1 = "srividhya.sub@gmail.com";
+    var password1 = "password123";
+
+    user1loginButton.addEventListener("click", function() {
+      firebase.auth().createUserWithEmailAndPassword(email1, password1).catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log(errorCode);
+        console.log(errorMessage);
+        // ...
+      });
       //email/password signin user
-      firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+      firebase.auth().signInWithEmailAndPassword(email1, password1).catch(function(error) {
   	     console.log(error);
       });
 
-      firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-          // User is signed in.
-          var displayName = user.displayName;
-          var email = user.email;
-          var emailVerified = user.emailVerified;
-          var photoURL = user.photoURL;
-          var isAnonymous = user.isAnonymous;
-          var uid = user.uid;
-          var providerData = user.providerData;
-          loginButton.disabled = true;
+      firebase.auth().onAuthStateChanged(function(user1) {
+        if (user1) {
+          // User1 is signed in.
+          var displayName = user1.displayName;
+          var email = user1.email;
+          var emailVerified = user1.emailVerified;
+          var photoURL = user1.photoURL;
+          var isAnonymous = user1.isAnonymous;
+          var uid = user1.uid;
+          var providerData = user1.providerData;
+          user1loginButton.disabled = true;
+          user2loginButton.style.display = "none";
           sendButton.style.display = "block";
           textInput.style.display = "block";
 
           // Start listening for data
           startListening();
         } else {
-          // User is signed out.
+          // User1 is signed out.
           // ...
         }
       });
-  });//end email/pass auth
-  logoutButton.addEventListener("click", function() {
-    firebase.auth().signOut().then(function() {
-      // Sign-out successful.
-      location.reload();//refreshes page and clears chat history & settings
-      loginButton.disabled = false;//enable login button status to sign backin
-      sendButton.style.display = "none";
-      textInput.style.display = "none";
-      }, function(error) {
-    	console.log(error);
+    });//end user1 email/pass auth
+
+    user2loginButton.addEventListener("click", function() {
+      firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log(errorCode);
+        console.log(errorMessage);
+        // ...
+      });
+
+      //email/password signin user
+      firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+         console.log(error);
+      });
+
+      firebase.auth().onAuthStateChanged(function(user2) {
+        if (user2) {
+          // User1 is signed in.
+          var displayName = user2.displayName;
+          var email = user2.email;
+          var emailVerified = user2.emailVerified;
+          var photoURL = user2.photoURL;
+          var isAnonymous = user2.isAnonymous;
+          var uid = user2.uid;
+          var providerData = user2.providerData;
+          user2loginButton.disabled = true;
+          user1loginButton.style.display = "none";
+          sendButton.style.display = "block";
+          textInput.style.display = "block";
+
+          // Start listening for data
+          startListening();
+        } else {
+          // User2 is signed out.
+          // ...
+        }
+      });
+    });//end user2 email/pass auth
+
+    logoutButton.addEventListener("click", function() {
+      firebase.auth().signOut().then(function() {
+        // Sign-out successful.
+        location.reload();//refreshes page and clears chat history & settings
+        user1loginButton.disabled = false;//enable login button status to sign backin
+        user2loginButton.disabled = false;
+        sendButton.style.display = "none";
+        textInput.style.display = "none";
+        }, function(error) {
+      	console.log(error);
+      });
     });
-  });
 
-  // BUGBUG: Following code fails at Firebase console not setup
-  // even after setup done.
-  // Need to investigate further.
-  /*
-  // Google Authentication till end of session
-  loginButton.addEventListener("click", function() {
-    var provider = new firebase.auth.GoogleAuthProvider();
-    provider.addScope('https://www.googleapis.com/auth/plus.login');
-    firebase.auth().signInWithPopup(provider).then(function(authData) {
-    	console.log(authData);
-    }).catch(function(error) {
-    	console.log(error);
-    });
-  });
-
-  myFirebase.onAuth(function (authData) {
-  if (authData) {
-      username = authData.google.displayName;
-      loginButton.textContent = "Logged in as " + username;
-      loginButton.disabled = true;
-      sendButton.style.display = "block";
-      textInput.style.display = "block";
-
-      // Start listening for data
-      startListening();
-  }
-  });
-  */
   </script>
 </body>
 </html>
